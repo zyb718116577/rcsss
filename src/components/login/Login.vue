@@ -2,16 +2,17 @@
     <div class="ui-contenner">
         <div class="ui-logo"></div>
         <div class="ui-main" style="box-shadow: 0px 0px 10px 10px rgba(0,0,0,.1);">
-            <Form class="login-content" ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+            <Form class="login-content" ref="formValidate" :model="formValidate" :rules="ruleValidate"
+                  :label-width="80">
                 <div class="ui-main-logo"></div>
-                <FormItem label="账号" prop="name">
-                    <Input v-model="formValidate.name" placeholder="Enter your name"></Input>
+                <FormItem label="账号" prop="loginName">
+                    <Input v-model="formValidate.loginName" placeholder="Enter your name"></Input>
                 </FormItem>
-                <FormItem label="密码" prop="password">
-                    <Input v-model="formValidate.password" placeholder="Enter your password" type="password"></Input>
+                <FormItem label="密码" prop="loginPwd">
+                    <Input v-model="formValidate.loginPwd" @on-keyup.enter="_handleSubmit('formValidate')" placeholder="Enter your password" type="password"></Input>
                 </FormItem>
                 <FormItem>
-                    <Button class="login-btn" type="primary" @click="handleSubmit('formValidate')">Submit</Button>
+                    <Button class="login-btn" type="primary" @click="_handleSubmit('formValidate')">Submit</Button>
                 </FormItem>
             </Form>
         </div>
@@ -19,35 +20,52 @@
 </template>
 
 <script type="text/ecmascript-6">
+    import {login} from 'api/login'
+    import {setCookie} from 'common/js/cookie'
     export default {
-        data () {
+        data() {
             return {
                 formValidate: {
-                    name: '',
-                    password: ''
+                    loginName: '',
+                    loginPwd: ''
                 },
                 ruleValidate: {
-                    name: [
-                        { required: true, message: '用户名不能为空！', trigger: 'blur' }
+                    loginName: [
+                        {required: true, message: '用户名不能为空！', trigger: 'blur'}
                     ],
-                    password: [
-                        { required: true, message: '密码不能为空！', trigger: 'blur' }
+                    loginPwd: [
+                        {required: true, message: '密码不能为空！', trigger: 'blur'}
                     ]
                 }
             }
         },
         methods: {
-            handleSubmit (name) {
+            _handleSubmit(name) {
+                console.log(this.formValidate)
                 this.$refs[name].validate((valid) => {
                     // 拿到数据对象
-                    console.log(this.$refs[name].model)
+                    let params = Object.assign({}, this.$refs[name].model, {
+                        _remember_me: true
+                    })
                     if (valid) {
-                        this.$Message.success('Success!');
-                    } else {
-                        this.$Message.error('Fail!');
+                        let _this = this;
+                        login({
+                            url: '/login',
+                            postData: params,
+                            successFn: function (res) {
+                                _this.$Message.success(res.data.msg);
+                                setCookie('RCSSS','LOGINFLAG','/',7);
+                                _this.timer = setTimeout(()=>{
+                                    _this.$router.push({path: '/user'});
+                                },1000)
+                            }
+                        });
                     }
                 })
             }
+        },
+        deactivated() {
+            clearTimeout(this.timer)
         }
     }
 </script>
@@ -72,6 +90,7 @@
         margin: 0px;
         height: 100%;
     }
+
     .ui-contenner {
         height: 100%;
         width: 100%;
@@ -79,7 +98,8 @@
         background-size: cover;
         position: relative;
     }
-    .ui-logo{
+
+    .ui-logo {
         position: absolute;
         top: 10%;
         left: 10%;
@@ -87,7 +107,8 @@
         height: 30px;
         background: url("../../../static/img/logo.png");
     }
-    .ui-main{
+
+    .ui-main {
         margin: auto;
         position: absolute;
         top: 0;
@@ -97,23 +118,27 @@
         width: 355px;
         height: 260px;
     }
-    .ui-main-logo{
+
+    .ui-main-logo {
         width: 100%;
         height: 70px;
         background: url(../../../static/img/wenzi.png) no-repeat 90px center;
     }
 
-    .login-btn{
+    .login-btn {
         background: #017cc4;
         width: 100%;
     }
-    .ui-error icon{
+
+    .ui-error icon {
         vertical-align: middle;
     }
+
     input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
         　　color: #fff;
     }
-    .login-content{
-         padding-right: 35px;
+
+    .login-content {
+        padding-right: 35px;
     }
 </style>

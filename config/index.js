@@ -10,7 +10,15 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+        '/rcsss': {
+            target: 'http://192.168.2.53/rcsss',//设置你调用的接口域名和端口号 别忘了加http
+            changeOrigin: true,
+            pathRewrite: {
+                '^/rcsss': '/'//这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://40.00.100.100:3002/user/add'，直接写‘/api/user/add’即可
+            }
+        }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -47,7 +55,7 @@ module.exports = {
     // just be aware of this issue when enabling this option.
     cssSourceMap: false,
   },
-  
+
   build: {
     // Template for index.html
     index: path.resolve(__dirname, '../dist/index.html'),
@@ -64,14 +72,14 @@ module.exports = {
     productionSourceMap: true,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
-    
+
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:
     // npm install --save-dev compression-webpack-plugin
     productionGzip: false,
     productionGzipExtensions: ['js', 'css'],
-    
+
     // Run the build command with an extra argument to
     // View the bundle analyzer report after build finishes:
     // `npm run build --report`
