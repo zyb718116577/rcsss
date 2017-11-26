@@ -41,7 +41,7 @@ export const menuRouter = [
                     title: '快速入口',
                     requireAuth: true
                 },
-                component: resolve => { require(['components/user/userInfoList'], resolve); }
+                component: resolve => { require(['components/quickEntry/quickentry'], resolve); }
             }
         ]
     },

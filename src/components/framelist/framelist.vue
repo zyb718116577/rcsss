@@ -2,7 +2,7 @@
     <div class="">
         <Card>
             <div slot="title" class="list-title">
-                <Form ref="formValidate" :model="formItem" inline>
+                <Form ref="formValidate" :model="formItem" inline class="my-css">
                     <FormItem v-for="item in queryHTML"
                               v-if="item.queryType !== 0"
                               :prop="item.fieldName"
@@ -165,7 +165,7 @@
 </script>
 
 <style lang="stylus" type="text/stylus" rel="stylesheet/stylus">
-    .ivu-form-item-content
+    .my-css .ivu-form-item-content
         display inline-block
     .page-con
         margin 20px 0 0 0

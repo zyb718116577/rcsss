@@ -56,7 +56,9 @@
                                 _this.$Message.success(res.data.msg);
                                 setCookie('RCSSS','LOGINFLAG','/',7);
                                 _this.timer = setTimeout(()=>{
-                                    _this.$router.push({path: '/user'});
+                                    _this.$router.push({
+                                        name: 'quick-entry'
+                                    });
                                 },1000)
                             }
                         });
