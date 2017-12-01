@@ -2,7 +2,7 @@
     <div class="">
         <framelist
             :refresh="refresh"
-            :frame-name="'groupInfoList'"
+            :frame-name="'macAddressList'"
             :action-buttons="actionButtons"
             :queryBtn=true
             :queryBtnClick="queryBtnClick">

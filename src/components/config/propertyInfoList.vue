@@ -2,49 +2,100 @@
     <div class="">
         <framelist
             :refresh="refresh"
-            :frame-name="'groupInfoList'"
+            :frame-name="'propertyInfoList'"
             :action-buttons="actionButtons"
             :queryBtn=true
             :queryBtnClick="queryBtnClick">
         </framelist>
         <Modal
             @on-visible-change="toggleModal"
-            title="新增用户"
+            title="新增属性"
             v-model="addmodal"
             :closable="true"
             :mask-closable="false">
-            <Form ref="formCustom" :model="formCustom" :rules="rules" :label-width="80">
-                <FormItem required label="分组名称" prop="groupName">
-                    <Input v-model="formCustom.groupName" placeholder="分组名称"></Input>
+            <Form ref="formCustom" :model="formCustom" :rules="rules" :label-width="95">
+                <FormItem required label="属性中文名" prop="propertyNameCn">
+                    <Input v-model="formCustom.propertyNameCn" placeholder="属性中文名"></Input>
                 </FormItem>
-                <FormItem required label="分组可见规则" prop="controlFlag">
-                    <RadioGroup v-model="formCustom.controlFlag">
-                        <Radio label="allPersonSee">
-                            <span>所有人可见</span>
+                <FormItem required label="属性英文名" prop="propertyNameCn">
+                    <Input v-model="formCustom.propertyNameEn" placeholder="属性英文名"></Input>
+                </FormItem>
+                <FormItem label="属性标签名">
+                    <Input v-model="formCustom.tagType" placeholder="属性标签名"></Input>
+                </FormItem>
+                <FormItem required label="属性默认值" prop="">
+                    <Input v-model="formCustom.defaultValue" placeholder="属性默认值"></Input>
+                </FormItem>
+                <FormItem required label="显示优先级" prop="groupName">
+                    <Input v-model="formCustom.displayOrder" placeholder="显示优先级"></Input>
+                </FormItem>
+                <FormItem required label="属性描述" prop="content">
+                    <Input v-model="formCustom.propertyDesc" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
+                           placeholder="属性描述"></Input>
+                </FormItem>
+                <FormItem required label="是否公共配置" prop="controlFlag">
+                    <RadioGroup v-model="formCustom.globalFlag">
+                        <Radio label="0">
+                            <span>私有配置</span>
                         </Radio>
-                        <Radio label="allPersonNoSee">
-                            <span>所有人不可见</span>
+                        <Radio label="1">
+                            <span>公共配置</span>
                         </Radio>
-                        <Radio label="sameGroupRecursion">
-                            <span>同组可见递归下级</span>
-                        </Radio>
-                        <Radio label="sameGroupNoRecursion">
-                            <span>同组可见不递归下级</span>
+                        <Radio label="2">
+                            <span>都是</span>
                         </Radio>
                     </RadioGroup>
                 </FormItem>
-                <FormItem required label="分组上级名称" prop="fGroupId">
-                    <Select @on-change="_change" v-model="item.choose" style="display: inline-block;width: 30%"
-                            v-for="(item,index) in fGroupArr" :key="index">
-                        <Option v-for="per in item.data" :label="per.groupName" :value="per.groupId"
-                                :key="per.groupId"></Option>
-                    </Select>
-                    <Button :loading="findLoading" type="primary" icon="ios-plus-outline" @click="_findNext">查找下级</Button>
+                <FormItem required label="用户自定义" prop="controlFlag">
+                    <RadioGroup v-model="formCustom.customizeFlag">
+                        <Radio label="0">
+                            <span>不能</span>
+                        </Radio>
+                        <Radio label="1">
+                            <span>能</span>
+                        </Radio>
+                    </RadioGroup>
                 </FormItem>
-                <FormItem required label="分组说明" prop="content">
-                    <Input v-model="formCustom.content" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
-                           placeholder="分组说明"></Input>
+                <FormItem required label="使用标志" prop="controlFlag">
+                    <RadioGroup v-model="formCustom.disableFlag">
+                        <Radio label="0">
+                            <span>失效</span>
+                        </Radio>
+                        <Radio label="1">
+                            <span>生效</span>
+                        </Radio>
+                    </RadioGroup>
                 </FormItem>
+                <FormItem required label="属性展示类型" prop="controlFlag">
+                    <RadioGroup v-model="formCustom.htmlType">
+                        <Radio label="2">
+                            <span>下拉框</span>
+                        </Radio>
+                        <Radio label="3">
+                            <span>多选</span>
+                        </Radio>
+                        <Radio label="4">
+                            <span>文本</span>
+                        </Radio>
+                    </RadioGroup>
+                </FormItem>
+                <Card v-for="(item,index) in formCustom.propertyExtends"
+                      :key="index"
+                      v-if="formCustom.propertyExtends.length > 0"
+                      style="height: 65px"  >
+                    <FormItem required label="扩展属性名" prop="propertyNameCn" class="extend-property">
+                        <Input v-model="item.showName" placeholder="扩展属性名"></Input>
+                    </FormItem>
+                    <FormItem required label="扩展属性值" prop="propertyNameCn" class="extend-property">
+                        <Input v-model="item.showValue" placeholder="扩展属性值"></Input>
+                    </FormItem>
+                    <Button type="text" v-if="index === 0">
+                        <Icon :size="20" type="ios-plus-outline"></Icon>
+                    </Button>
+                    <Button type="text" v-if="index > 0">
+                        <Icon :size="20" type="ios-trash-outline"></Icon>
+                    </Button>
+                </Card>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="_cancel('formCustom')">取消</Button>
@@ -110,11 +161,47 @@
                 addmodal: false,
                 modal_loading: false,
                 fGroupArr: [{choose: 0, data: [{groupId: 0, groupName: '中国'}]}],
-                formCustom: {},
+                formCustom: {
+                    customizeFlag:"0",
+                    defaultValue:"value1",
+                    disableFlag:"1",
+                    displayOrder:"1",
+                    fieldId:0,
+                    globalFlag:"0",
+                    htmlType:"2",
+                    propertyDesc:"描述1",
+                    propertyExtends:[{propertyId: 0, recId: 0, showName: "扩展1", showValue: "value1"},{
+                        "propertyId":2,
+                        "recId":4,
+                        "showName":"扩展2",
+                        "showValue":"value2"
+                    }],
+                    propertyId:0,
+                    propertyNameCn:"属性1",
+                    propertyNameEn:"en1",
+                    tagType:"标签1",
+                },
                 rules: {
-                    groupName: [rule.length_20],
+                    propertyNameCn: [rule.length_20],
                     content: [rule.length_200],
                     controlFlag: [rule.select]
+                }
+            }
+        },
+        watch: {
+            /*观察整个对象的变化*/
+            /*formCustom: {
+                handler(newValue, oldValue) {
+                    console.log(newValue)
+                },
+                deep: true
+            },*/
+            /*观察对象内指定属性*/
+            ['formCustom.htmlType'](val) {
+                if (val == 4) {
+                    this.formCustom.propertyExtends = [];
+                } else if(val == 2 || val == 3) {
+                    this.formCustom.propertyExtends = [{propertyId: 0, recId: 0, showName: "扩展1", showValue: "value1"}];
                 }
             }
         },
@@ -258,5 +345,7 @@
 </script>
 
 <style lang="stylus" type="text/stylus" rel="stylesheet/stylus">
-
+    .extend-property
+        display inline-block;
+        width 43%
 </style>

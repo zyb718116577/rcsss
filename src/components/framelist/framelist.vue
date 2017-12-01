@@ -23,9 +23,12 @@
                             <Option :value="items.csValue" v-for="items in item.constantInfos" :key="items.csValue">{{items.csName}}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem>
+                    <FormItem v-if="queryHTML.length > 0">
                         <Button type="primary" @click="_getQueryObj('formValidate')">查询</Button>
                         <Button type="ghost"  style="margin-left: 8px" @click="handleReset('formValidate')">重置</Button>
+                        <Button type="primary" style="margin-left: 8px"
+                                @click="queryBtnClick"
+                                v-if="queryBtn">{{queryBtnTxt}}</Button>
                     </FormItem>
                 </Form>
             </div>
@@ -38,6 +41,7 @@
             <div class="page-con">
                 <Page :total="pageData.totalRows" show-total class="page-inner"
                       :page-size="pageData.perRows"
+                      show-elevator
                       @on-change="_changePage" ></Page>
             </div>
         </Card>
@@ -53,7 +57,17 @@
             actionButtons: {
                 type: Object
             },
-            refresh: Boolean
+            refresh: Boolean,
+            queryBtn: Boolean,
+            queryBtnTxt: {
+                type: String,
+                default () {
+                    return '新增'
+                }
+            },
+            queryBtnClick: {
+                type: Function
+            }
         },
         data() {
             return {
@@ -69,6 +83,7 @@
             }
         },
         methods: {
+            /*向服务器端拿取数据*/
             _frameList() {
                 this.loading = true;
                 let _this = this;
@@ -87,7 +102,7 @@
 
             /*组装数据*/
             _makeData(res) {
-                this.queryHTML = res.fieldInfos
+                this.queryHTML = res.fieldInfos;
                 this.pageData = res.page;
                 let tableData = res.fieldDatas;
                 if (!tableData.length) {
@@ -141,8 +156,9 @@
             /*封装搜索obj*/
             _getQueryObj(name) {
                 this.queryObj = this.formItem;
+                console.log(this.queryObj)
                 for (let n in this.queryObj) {
-                    if (!this.queryObj[n]) {
+                    if (!this.queryObj[n] || (!this.queryObj[n][0] && !this.queryObj[n][0]) ) {
                         delete this.queryObj[n];
                     }
                 }

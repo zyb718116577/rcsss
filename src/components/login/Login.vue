@@ -41,7 +41,6 @@
         },
         methods: {
             _handleSubmit(name) {
-                console.log(this.formValidate)
                 this.$refs[name].validate((valid) => {
                     // 拿到数据对象
                     let params = Object.assign({}, this.$refs[name].model, {

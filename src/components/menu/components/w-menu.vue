@@ -1,5 +1,5 @@
 <template>
-    <Menu :theme="'dark'" mode="vertical" @on-select="changeMenu" style="width: 200px">
+    <Menu :theme="'dark'" :active-name="$route.name" :open-names="openNames" mode="vertical" @on-select="changeMenu" style="width: 200px">
         <template>
         <MenuItem :name="item.name" v-for="item in menuList" :key="item.path" v-if="item.children.length==1 && item.name === item.children[0].name">
             <Icon :type="item.icon"></Icon>
@@ -25,6 +25,11 @@
         props: {
             menuList: {
                 type: Array
+            }
+        },
+        data() {
+            return {
+                openNames: this.$store.state.openedSubmenuArr
             }
         },
         methods: {

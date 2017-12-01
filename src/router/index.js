@@ -21,6 +21,14 @@ const redictRouter = {
     // 重定向（默认路由）
     redirect: '/login'
 };
+export const lockRouter = {
+    path: '/locking',
+    name: 'locking',
+    meta: {
+        title: '锁屏'
+    },
+    component: resolve => { require(['components/lock-screen/locking-page'], resolve); }
+};
 export const menuRouter = [
     {
         path: '/quick',
@@ -58,7 +66,7 @@ export const menuRouter = [
         children: [
             {
                 path: 'userInfoList',
-                icon: 'compose',
+                icon: 'person-stalker',
                 name: 'userInfoList',
                 meta: {
                     title: '用户管理',
@@ -97,18 +105,75 @@ export const menuRouter = [
                     title: '自动更新',
                     requireAuth: true
                 },
-                component: resolve => { require(['components/user/userInfoList'], resolve); }
-            }
+                component: resolve => { require(['components/config/updateConfigList'], resolve); }
+            },
+            {
+                path: 'propertyInfoList',
+                icon: 'ios-cog-outline',
+                name: 'propertyInfoList',
+                meta: {
+                    title: '属性管理',
+                    requireAuth: true
+                },
+                component: resolve => { require(['components/config/propertyInfoList'], resolve); }
+            },
+            {
+                path: 'regularLinkageList',
+                icon: 'merge',
+                name: 'regularLinkageList',
+                meta: {
+                    title: '联动管理',
+                    requireAuth: true
+                },
+                component: resolve => { require(['components/config/regularLinkageList'], resolve); }
+            },
+            {
+                path: 'macAddressList',
+                icon: 'social-vimeo',
+                name: 'macAddressList',
+                meta: {
+                    title: '版本监控',
+                    requireAuth: true
+                },
+                component: resolve => { require(['components/config/macAddressList'], resolve); }
+            },
+            {
+                path: 'meetingInfoList',
+                icon: 'chatboxes',
+                name: 'meetingInfoList',
+                meta: {
+                    title: '会议管理',
+                    requireAuth: true
+                },
+                component: resolve => { require(['components/config/meetingInfoList'], resolve); }
+            },
         ]
     }
 ];
+export const page404 = {
+    path: '/*',
+    name: 'error-404',
+    meta: {
+        title: '404-页面不存在'
+    },
+    component: resolve => { require(['components/error-page/404.vue'], resolve); }
+};
 
-let routes = [...menuRouter,loginRouter,redictRouter];
+let routes = [
+    ...menuRouter,
+    loginRouter,
+    redictRouter,
+    lockRouter,
+    page404
+];
 
 export const router = new Router({routes: routes});
 
 router.beforeEach((to, from, next) => {
     store.commit('setCurrentPath',to);
+    if (to.matched[0]){
+        store.commit('addOpenSubmenu',to.matched[0].name);
+    }
     iView.LoadingBar.start();
     Util.title(to.meta.title);
     if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限
@@ -128,3 +193,4 @@ router.afterEach((to) => {
     iView.LoadingBar.finish();
     window.scrollTo(0, 0);
 });
+

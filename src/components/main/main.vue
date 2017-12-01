@@ -13,9 +13,12 @@
         <div class="main" :style="{'padding-left':shrink? '60px' :'200px'}">
             <m-header :data="userInfo" :shrink="shrink" @on-change="changeMenu"></m-header>
             <div class="main-con">
-                <router-view></router-view>
+                <keep-alive>
+                    <router-view :user-info="userInfo"></router-view>
+                </keep-alive>
             </div>
         </div>
+        <setting :user-info="userInfo"></setting>
     </div>
 
 </template>
@@ -23,6 +26,9 @@
     import MHeader from 'components/m-header/m-header'
     import MyMenu from 'components/menu/menu'
     import {getCurrentInfo} from 'api/user'
+    import setting from 'components/setting/setting'
+    import star from 'components/test/star'
+
     export default {
         data() {
             return {
@@ -50,7 +56,9 @@
         },
         components: {
             MHeader,
-            MyMenu
+            MyMenu,
+            setting,
+            star
         }
     }
 </script>
